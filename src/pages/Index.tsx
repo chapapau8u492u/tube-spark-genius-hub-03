@@ -8,9 +8,11 @@ import OutlierDetector from '@/components/OutlierDetector';
 import KeywordAnalyzer from '@/components/KeywordAnalyzer';
 import ProfileHub from '@/components/ProfileHub';
 import AppSidebar from '@/components/AppSidebar';
+
 const Index = () => {
   const [activeView, setActiveView] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   const aiTools = [{
     id: 'content-generator',
     title: 'AI Content Generator',
@@ -47,6 +49,7 @@ const Index = () => {
     gradient: 'from-blue-500 to-cyan-500',
     component: KeywordAnalyzer
   }];
+
   const renderActiveView = () => {
     if (activeView === 'profile') {
       return <ProfileHub />;
@@ -59,32 +62,33 @@ const Index = () => {
     const Component = activeTool.component;
     return <Component />;
   };
+
   const renderHomePage = () => <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
       {/* Hero Section */}
-      <div className="text-center mb-16 py-12 px-6">
+      <div className="text-center mb-20 py-16 px-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-96 h-96 bg-gradient-to-r from-red-500/10 via-blue-500/10 to-purple-500/10 rounded-full blur-3xl animate-pulse" />
           </div>
           <div className="relative">
-            <h1 className="text-5xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-white via-red-200 to-blue-200 bg-clip-text text-transparent">
+            <h1 className="text-6xl md:text-8xl font-bold mb-8 bg-gradient-to-r from-white via-red-200 to-blue-200 bg-clip-text text-transparent">
               YouTube AI Studio
             </h1>
-            <p className="text-lg md:text-xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-gray-300 mb-16 max-w-5xl mx-auto leading-relaxed">
               Transform your YouTube channel with intelligent AI tools that understand, analyze, and optimize your content for maximum impact.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
-              <div className="flex items-center space-x-3 text-sm text-red-400">
-                <div className="w-3 h-3 bg-red-400 rounded-full animate-pulse shadow-lg shadow-red-400/50" />
-                <span className="font-medium">Content Generation</span>
+            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12">
+              <div className="flex items-center space-x-4 text-base text-red-400">
+                <div className="w-4 h-4 bg-red-400 rounded-full animate-pulse shadow-lg shadow-red-400/50" />
+                <span className="font-semibold">Content Generation</span>
               </div>
-              <div className="flex items-center space-x-3 text-sm text-blue-400">
-                <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse delay-300 shadow-lg shadow-blue-400/50" />
-                <span className="font-medium">Analytics & Insights</span>
+              <div className="flex items-center space-x-4 text-base text-blue-400">
+                <div className="w-4 h-4 bg-blue-400 rounded-full animate-pulse delay-300 shadow-lg shadow-blue-400/50" />
+                <span className="font-semibold">Analytics & Insights</span>
               </div>
-              <div className="flex items-center space-x-3 text-sm text-green-400">
-                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse delay-700 shadow-lg shadow-green-400/50" />
-                <span className="font-medium">Viral Optimization</span>
+              <div className="flex items-center space-x-4 text-base text-green-400">
+                <div className="w-4 h-4 bg-green-400 rounded-full animate-pulse delay-700 shadow-lg shadow-green-400/50" />
+                <span className="font-semibold">Viral Optimization</span>
               </div>
             </div>
           </div>
@@ -92,9 +96,29 @@ const Index = () => {
       </div>
 
       {/* AI Tools Grid */}
-      <div className="px-6 mb-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 max-w-7xl mx-auto">
-          {aiTools.map(tool => <AIToolCard key={tool.id} title={tool.title} description={tool.description} icon={tool.icon} gradient={tool.gradient} onClick={() => setActiveView(tool.id)} />)}
+      <div className="px-8 mb-24">
+        <div className="max-w-8xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+              AI-Powered Creation Suite
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Unleash the power of artificial intelligence to elevate your YouTube content strategy
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-10">
+            {aiTools.map(tool => (
+              <AIToolCard 
+                key={tool.id} 
+                title={tool.title} 
+                description={tool.description} 
+                icon={tool.icon} 
+                gradient={tool.gradient} 
+                onClick={() => setActiveView(tool.id)} 
+              />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -142,6 +166,7 @@ const Index = () => {
         </div>
       </div>
     </div>;
+
   return <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex">
       <AppSidebar activeView={activeView} onViewChange={setActiveView} isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
       
@@ -152,4 +177,5 @@ const Index = () => {
       </div>
     </div>;
 };
+
 export default Index;
