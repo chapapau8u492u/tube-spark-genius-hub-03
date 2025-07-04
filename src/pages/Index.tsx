@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Sparkles, Image, Search, BarChart3, TrendingUp } from 'lucide-react';
 import AIToolCard from '@/components/AIToolCard';
@@ -9,72 +8,58 @@ import OutlierDetector from '@/components/OutlierDetector';
 import KeywordAnalyzer from '@/components/KeywordAnalyzer';
 import ProfileHub from '@/components/ProfileHub';
 import AppSidebar from '@/components/AppSidebar';
-
 const Index = () => {
   const [activeView, setActiveView] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
-  const aiTools = [
-    {
-      id: 'content-generator',
-      title: 'AI Content Generator',
-      description: 'Generate optimized YouTube titles, descriptions, tags, and thumbnail prompts using advanced AI.',
-      icon: Sparkles,
-      gradient: 'from-purple-500 to-pink-500',
-      component: ContentGenerator
-    },
-    {
-      id: 'thumbnail-generator',
-      title: 'Thumbnail Generator',
-      description: 'Create stunning, professional YouTube thumbnails with AI-powered design assistance.',
-      icon: Image,
-      gradient: 'from-green-500 to-teal-500',
-      component: ThumbnailGenerator
-    },
-    {
-      id: 'thumbnail-search',
-      title: 'Thumbnail Search',
-      description: 'Discover trending thumbnails and analyze competitor strategies with AI insights.',
-      icon: Search,
-      gradient: 'from-indigo-500 to-purple-500',
-      component: ThumbnailSearch
-    },
-    {
-      id: 'outlier-detector',
-      title: 'Outlier Detection',
-      description: 'Identify viral videos and content anomalies using statistical analysis and smart scoring.',
-      icon: BarChart3,
-      gradient: 'from-orange-500 to-red-500',
-      component: OutlierDetector
-    },
-    {
-      id: 'keyword-analyzer',
-      title: 'Keyword Analyzer',
-      description: 'Extract trending keywords with SEO scores and related search phrases for optimization.',
-      icon: TrendingUp,
-      gradient: 'from-blue-500 to-cyan-500',
-      component: KeywordAnalyzer
-    }
-  ];
-
+  const aiTools = [{
+    id: 'content-generator',
+    title: 'AI Content Generator',
+    description: 'Generate optimized YouTube titles, descriptions, tags, and thumbnail prompts using advanced AI.',
+    icon: Sparkles,
+    gradient: 'from-purple-500 to-pink-500',
+    component: ContentGenerator
+  }, {
+    id: 'thumbnail-generator',
+    title: 'Thumbnail Generator',
+    description: 'Create stunning, professional YouTube thumbnails with AI-powered design assistance.',
+    icon: Image,
+    gradient: 'from-green-500 to-teal-500',
+    component: ThumbnailGenerator
+  }, {
+    id: 'thumbnail-search',
+    title: 'Thumbnail Search',
+    description: 'Discover trending thumbnails and analyze competitor strategies with AI insights.',
+    icon: Search,
+    gradient: 'from-indigo-500 to-purple-500',
+    component: ThumbnailSearch
+  }, {
+    id: 'outlier-detector',
+    title: 'Outlier Detection',
+    description: 'Identify viral videos and content anomalies using statistical analysis and smart scoring.',
+    icon: BarChart3,
+    gradient: 'from-orange-500 to-red-500',
+    component: OutlierDetector
+  }, {
+    id: 'keyword-analyzer',
+    title: 'Keyword Analyzer',
+    description: 'Extract trending keywords with SEO scores and related search phrases for optimization.',
+    icon: TrendingUp,
+    gradient: 'from-blue-500 to-cyan-500',
+    component: KeywordAnalyzer
+  }];
   const renderActiveView = () => {
     if (activeView === 'profile') {
       return <ProfileHub />;
     }
-    
     if (activeView === 'home' || !activeView) {
       return renderHomePage();
     }
-    
     const activeTool = aiTools.find(tool => tool.id === activeView);
     if (!activeTool) return renderHomePage();
-    
     const Component = activeTool.component;
     return <Component />;
   };
-
-  const renderHomePage = () => (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+  const renderHomePage = () => <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
       {/* Hero Section */}
       <div className="text-center mb-16 py-12 px-6">
         <div className="relative">
@@ -109,21 +94,12 @@ const Index = () => {
       {/* AI Tools Grid */}
       <div className="px-6 mb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 max-w-7xl mx-auto">
-          {aiTools.map((tool) => (
-            <AIToolCard
-              key={tool.id}
-              title={tool.title}
-              description={tool.description}
-              icon={tool.icon}
-              gradient={tool.gradient}
-              onClick={() => setActiveView(tool.id)}
-            />
-          ))}
+          {aiTools.map(tool => <AIToolCard key={tool.id} title={tool.title} description={tool.description} icon={tool.icon} gradient={tool.gradient} onClick={() => setActiveView(tool.id)} />)}
         </div>
       </div>
 
       {/* Features Showcase */}
-      <div className="px-6">
+      <div className="px-6 hidden">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-red-500 to-pink-500 rounded-3xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
@@ -165,25 +141,15 @@ const Index = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex">
-      <AppSidebar 
-        activeView={activeView} 
-        onViewChange={setActiveView}
-        isCollapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
+    </div>;
+  return <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex">
+      <AppSidebar activeView={activeView} onViewChange={setActiveView} isCollapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)} />
       
       <div className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
         <div className="min-h-screen">
           {renderActiveView()}
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
