@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { UserButton } from '@clerk/clerk-react';
+import { UserButton, useUser } from '@clerk/clerk-react';
 import { Bot, Sparkles, Image, Search, BarChart3, TrendingUp, User, ChevronRight, Menu, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -15,6 +16,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
   isCollapsed,
   onToggleCollapse
 }) => {
+  const { user } = useUser();
+  
   const aiTools = [{
     id: 'home',
     title: 'Home',
@@ -29,7 +32,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
     section: 'ai-tools'
   }, {
     id: 'thumbnail-generator',
-    title: 'Visual Creator',
+    title: 'Thumbnail Creator',
     description: 'Design stunning thumbnails',
     icon: Image,
     section: 'ai-tools'
@@ -69,7 +72,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
           ${isActive ? 'bg-red-600 text-white shadow-lg' : 'text-gray-300 hover:bg-white/10 hover:text-white'}
           ${isCollapsed ? 'justify-center px-2' : 'justify-start'}
         `}>
-        <Icon className={`${isCollapsed ? 'w-6 h-6' : 'w-5 h-5'} flex-shrink-0`} />
+        <Icon className={`${isCollapsed ? 'w-5 h-5' : 'w-4 h-4'} flex-shrink-0`} />
         {!isCollapsed && <div className="flex-1 text-left min-w-0">
             <div className="font-medium text-sm truncate">{tool.title}</div>
             {!isActive && <div className="text-xs text-gray-400 truncate">{tool.description}</div>}
@@ -84,24 +87,24 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
       ${isCollapsed ? 'w-16' : 'w-64'}
     `}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-700/50">
-        <Button variant="ghost" size="icon" onClick={onToggleCollapse} className="text-gray-300 hover:text-white hover:bg-white/10">
-          <Menu className="w-5 h-5" />
-        </Button>
-        
+      <div className="flex items-center justify-between p-3 border-b border-gray-700/50">
         {!isCollapsed && <div className="flex items-center justify-center gap-2 flex-1 my-0 mx-0">
-            <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="w-7 h-7 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div>
               <h1 className="text-white font-bold text-lg mx-0 px-0">AI Studio</h1>
             </div>
           </div>}
+        
+        <Button variant="ghost" size="icon" onClick={onToggleCollapse} className="text-gray-300 hover:text-white hover:bg-white/10">
+          <Menu className="w-4 h-4" />
+        </Button>
       </div>
 
       {/* Scrollable Content */}
-      <ScrollArea className="flex-1 h-[calc(100vh-140px)]">
-        <div className="p-2 space-y-6">
+      <ScrollArea className="flex-1 h-[calc(100vh-120px)]">
+        <div className="p-2 space-y-4">
           {/* Main Section */}
           <div className="space-y-1">
             {mainTools.map(renderMenuItem)}
@@ -109,7 +112,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
 
           {/* AI Tools Section */}
           <div className="space-y-1">
-            {!isCollapsed && <div className="px-3 py-2">
+            {!isCollapsed && <div className="px-3 py-1">
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">AI Tools</h3>
               </div>}
             {aiToolsSection.map(renderMenuItem)}
@@ -117,7 +120,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
 
           {/* Account Section */}
           <div className="space-y-1">
-            {!isCollapsed && <div className="px-3 py-2">
+            {!isCollapsed && <div className="px-3 py-1">
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Account</h3>
               </div>}
             {accountTools.map(renderMenuItem)}
@@ -126,17 +129,17 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-700/50">
+      <div className="p-3 border-t border-gray-700/50">
         <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : 'justify-start'}`}>
           <UserButton appearance={{
           elements: {
-            avatarBox: "w-8 h-8",
+            avatarBox: "w-7 h-7",
             userButtonPopoverCard: "bg-gray-900 border border-gray-700",
             userButtonPopoverActions: "text-white"
           }
         }} />
           {!isCollapsed && <div className="text-white">
-              <div className="text-sm font-medium">Creator Mode</div>
+              <div className="text-sm font-medium">{user?.firstName || 'Creator'}</div>
               <div className="text-xs text-gray-400">Ready to create</div>
             </div>}
         </div>

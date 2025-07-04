@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -290,7 +289,7 @@ const ThumbnailGenerator: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-muted-foreground">Generated using</p>
-                  <p className="font-medium">Gemini AI + Custom Generator</p>
+                  <p className="font-medium">AI</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Optimized for</p>
