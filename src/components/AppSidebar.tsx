@@ -1,10 +1,10 @@
+
 import React, { useState } from 'react';
 import { UserButton } from '@clerk/clerk-react';
 import { 
   Bot, 
   Sparkles, 
   Image, 
-  Search, 
   BarChart3, 
   TrendingUp, 
   User, 
@@ -39,7 +39,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
     {
       id: 'content-generator',
       title: 'Content Studio',
-      description: 'Generate viral content with AI',
+      description: 'Create engaging titles, descriptions, and tags',
       icon: Bot,
       section: 'ai-tools'
     },
@@ -48,13 +48,6 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
       title: 'Visual Creator',
       description: 'Design stunning thumbnails',
       icon: Image,
-      section: 'ai-tools'
-    },
-    {
-      id: 'thumbnail-search',
-      title: 'Trend Explorer',
-      description: 'Discover viral patterns',
-      icon: Search,
       section: 'ai-tools'
     },
     {
@@ -126,15 +119,6 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
     `}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-700/50">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onToggleCollapse}
-          className="text-gray-300 hover:text-white hover:bg-white/10"
-        >
-          <Menu className="w-5 h-5" />
-        </Button>
-        
         {!isCollapsed && (
           <div className="flex items-center justify-center gap-2 flex-1">
             <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center">
@@ -145,6 +129,15 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
             </div>
           </div>
         )}
+        
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onToggleCollapse}
+          className="text-gray-300 hover:text-white hover:bg-white/10"
+        >
+          <Menu className="w-5 h-5" />
+        </Button>
       </div>
 
       {/* Scrollable Content */}
