@@ -101,7 +101,7 @@ const Landing = () => {
                 </Button>
               </SignedIn>
               
-              <Button variant="ghost" size="lg" className="text-white hover:bg-white/10 text-lg px-8 py-4 rounded-full border border-white/20 onClick={() => window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank")}">
+              <Button variant="ghost" size="lg" className="text-white hover:bg-white/10 text-lg px-8 py-4 rounded-full border border-white/20 " onClick={() => window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank")}>
                 <Play className="mr-2 w-5 h-5" />
                 Watch Demo
               </Button>
