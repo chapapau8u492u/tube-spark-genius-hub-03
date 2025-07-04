@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { 
@@ -48,14 +47,15 @@ interface YouTubeStats {
 const ProfileHub: React.FC = () => {
   const { user } = useUser();
   const [youtubeStats, setYoutubeStats] = useState<YouTubeStats | null>(null);
-  const [apiKey, setApiKey] = useState('');
   const [channelId, setChannelId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const API_KEY = 'AIzaSyBHa2NR6HA3TuIVX-9k8c1Xzo6PNRsa4ds';
+
   const fetchYouTubeStats = async () => {
-    if (!apiKey || !channelId) {
-      setError('Please provide both API key and Channel ID');
+    if (!channelId) {
+      setError('Please provide your Channel ID');
       return;
     }
 
@@ -65,7 +65,7 @@ const ProfileHub: React.FC = () => {
     try {
       // Fetch channel statistics
       const channelResponse = await fetch(
-        `https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=${channelId}&key=${apiKey}`
+        `https://www.googleapis.com/youtube/v3/channels?part=statistics,snippet&id=${channelId}&key=${API_KEY}`
       );
 
       if (!channelResponse.ok) {
@@ -82,7 +82,7 @@ const ProfileHub: React.FC = () => {
       
       // Fetch recent videos
       const videosResponse = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=5&order=date&type=video&key=${apiKey}`
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=5&order=date&type=video&key=${API_KEY}`
       );
 
       let recentVideos = [];
@@ -92,7 +92,7 @@ const ProfileHub: React.FC = () => {
         
         if (videoIds) {
           const videoStatsResponse = await fetch(
-            `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds}&key=${apiKey}`
+            `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds}&key=${API_KEY}`
           );
           
           if (videoStatsResponse.ok) {
@@ -123,7 +123,6 @@ const ProfileHub: React.FC = () => {
 
       setYoutubeStats(stats);
       localStorage.setItem('youtube_stats', JSON.stringify(stats));
-      localStorage.setItem('youtube_api_key', apiKey);
       localStorage.setItem('youtube_channel_id', channelId);
     } catch (err: any) {
       setError(err.message || 'Failed to fetch YouTube data');
@@ -135,14 +134,10 @@ const ProfileHub: React.FC = () => {
 
   useEffect(() => {
     const savedStats = localStorage.getItem('youtube_stats');
-    const savedApiKey = localStorage.getItem('youtube_api_key');
     const savedChannelId = localStorage.getItem('youtube_channel_id');
     
     if (savedStats) {
       setYoutubeStats(JSON.parse(savedStats));
-    }
-    if (savedApiKey) {
-      setApiKey(savedApiKey);
     }
     if (savedChannelId) {
       setChannelId(savedChannelId);
@@ -172,7 +167,7 @@ const ProfileHub: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-4">Profile Hub</h1>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent mb-4">Profile Hub</h1>
             <p className="text-gray-400 text-lg">Connect your YouTube channel to view analytics</p>
           </div>
 
@@ -184,18 +179,6 @@ const ProfileHub: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="apiKey" className="text-gray-300">YouTube Data API Key</Label>
-                <Input
-                  id="apiKey"
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Enter your YouTube Data API key"
-                  className="bg-gray-700 border-gray-600 text-white"
-                />
-              </div>
-              
               <div>
                 <Label htmlFor="channelId" className="text-gray-300">Channel ID</Label>
                 <Input
@@ -215,19 +198,19 @@ const ProfileHub: React.FC = () => {
 
               <Button 
                 onClick={fetchYouTubeStats}
-                disabled={loading || !apiKey || !channelId}
+                disabled={loading || !channelId}
                 className="w-full bg-red-600 hover:bg-red-700"
               >
                 {loading ? 'Connecting...' : 'Connect Channel'}
               </Button>
 
               <div className="text-sm text-gray-400 space-y-2">
-                <p><strong>How to get your API key:</strong></p>
+                <p><strong>How to find your Channel ID:</strong></p>
                 <ol className="list-decimal list-inside space-y-1 ml-4">
-                  <li>Go to Google Cloud Console</li>
-                  <li>Create a new project or select existing</li>
-                  <li>Enable YouTube Data API v3</li>
-                  <li>Create credentials (API key)</li>
+                  <li>Go to your YouTube channel</li>
+                  <li>Click on "Settings" or "Customize channel"</li>
+                  <li>Go to "Advanced settings"</li>
+                  <li>Copy your Channel ID</li>
                 </ol>
               </div>
             </CardContent>
@@ -243,7 +226,7 @@ const ProfileHub: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Profile Hub</h1>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-400 to-pink-400 bg-clip-text text-transparent mb-2">Profile Hub</h1>
             <p className="text-gray-400">Your YouTube channel analytics dashboard</p>
           </div>
           <Button 

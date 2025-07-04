@@ -1,12 +1,13 @@
 
 import React from 'react';
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
-import { Play, Zap, Sparkles, Bot, Rocket, Star, ArrowRight, Globe, Palette, BarChart } from 'lucide-react';
+import { Play, Zap, Sparkles, Bot, Rocket, Star, ArrowRight, Globe, Palette, BarChart, TrendingUp, Eye, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
@@ -21,7 +22,7 @@ const Landing = () => {
             <Bot className="w-6 h-6 text-white" />
           </div>
           <span className="text-2xl font-bold bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent">
-            TubeSpark
+            YouTube AI Studio
           </span>
         </div>
         
@@ -53,26 +54,38 @@ const Landing = () => {
       {/* Hero Section */}
       <main className="relative z-10 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center py-20 lg:py-32">
+          <div className="text-center py-16 lg:py-24">
             <div className="mb-8 inline-flex items-center space-x-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-6 py-3">
               <Sparkles className="w-4 h-4 text-cyan-400" />
               <span className="text-sm text-cyan-300">AI-Powered YouTube Optimization</span>
             </div>
             
             <h1 className="text-5xl lg:text-7xl font-extrabold mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Unleash Your
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Creative Power
+              <span className="bg-gradient-to-r from-white via-cyan-200 to-purple-200 bg-clip-text text-transparent">
+                YouTube AI Studio
               </span>
             </h1>
             
             <p className="text-xl lg:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-              Transform your YouTube journey with cutting-edge AI tools that generate viral content, 
-              optimize thumbnails, and unlock hidden growth patterns.
+              Transform your YouTube channel with intelligent AI tools that understand, analyze, and optimize your 
+              content for maximum impact.
             </p>
+
+            {/* Feature Tags */}
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
+              <div className="flex items-center gap-2 bg-red-500/20 text-red-300 px-4 py-2 rounded-full border border-red-500/30">
+                <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                Content Generation
+              </div>
+              <div className="flex items-center gap-2 bg-blue-500/20 text-blue-300 px-4 py-2 rounded-full border border-blue-500/30">
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                Analytics & Insights
+              </div>
+              <div className="flex items-center gap-2 bg-green-500/20 text-green-300 px-4 py-2 rounded-full border border-green-500/30">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                Viral Optimization
+              </div>
+            </div>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <SignedOut>
@@ -95,57 +108,55 @@ const Landing = () => {
             </div>
           </div>
 
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-20">
+          {/* AI Tools Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-16">
             {[
               {
                 icon: Bot,
-                title: "AI Content Studio",
-                description: "Generate viral titles, descriptions, and tags with advanced AI algorithms",
-                gradient: "from-cyan-500 to-blue-500"
+                title: "AI Content Generator",
+                description: "Generate optimized YouTube titles, descriptions, tags, and thumbnail prompts using advanced AI.",
+                gradient: "from-pink-500 via-purple-500 to-pink-600",
+                iconBg: "bg-gradient-to-r from-pink-500 to-purple-500"
               },
               {
                 icon: Palette,
-                title: "Smart Thumbnails",
-                description: "Create eye-catching thumbnails that boost click-through rates",
-                gradient: "from-purple-500 to-pink-500"
+                title: "Thumbnail Generator",
+                description: "Create stunning, professional YouTube thumbnails with AI-powered design assistance.",
+                gradient: "from-green-500 via-teal-500 to-green-600",
+                iconBg: "bg-gradient-to-r from-green-500 to-teal-500"
+              },
+              {
+                icon: Search,
+                title: "Thumbnail Search",
+                description: "Discover trending thumbnails and analyze competitor strategies with AI insights.",
+                gradient: "from-purple-500 via-blue-500 to-purple-600",
+                iconBg: "bg-gradient-to-r from-purple-500 to-blue-500"
               },
               {
                 icon: BarChart,
-                title: "Performance Insights",
-                description: "Detect viral patterns and optimize your content strategy",
-                gradient: "from-green-500 to-teal-500"
+                title: "Outlier Detection",
+                description: "Identify viral videos and content anomalies using statistical analysis and machine learning insights.",
+                gradient: "from-orange-500 via-red-500 to-orange-600",
+                iconBg: "bg-gradient-to-r from-orange-500 to-red-500"
               },
               {
-                icon: Globe,
-                title: "Trend Discovery",
-                description: "Stay ahead with real-time trending topics and keywords",
-                gradient: "from-orange-500 to-red-500"
-              },
-              {
-                icon: Zap,
-                title: "Instant Analysis",
-                description: "Get immediate feedback on your content performance",
-                gradient: "from-yellow-500 to-orange-500"
-              },
-              {
-                icon: Rocket,
-                title: "Growth Acceleration",
-                description: "Scale your channel with data-driven optimization",
-                gradient: "from-indigo-500 to-purple-500"
+                icon: TrendingUp,
+                title: "Keyword Analyzer",
+                description: "Extract trending keywords with SEO scores and related search phrases for maximum reach.",
+                gradient: "from-blue-500 via-cyan-500 to-blue-600",
+                iconBg: "bg-gradient-to-r from-blue-500 to-cyan-500"
               }
-            ].map((feature, index) => (
-              <div key={index} className="group relative">
-                <div className="absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-20 transition-opacity duration-300 rounded-2xl blur-xl" 
-                     style={{background: `linear-gradient(to right, var(--tw-gradient-stops))`}} />
-                <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all duration-300 transform hover:-translate-y-2">
-                  <div className={`w-12 h-12 bg-gradient-to-r ${feature.gradient} rounded-xl flex items-center justify-center mb-6`}>
-                    <feature.icon className="w-6 h-6 text-white" />
+            ].map((tool, index) => (
+              <Card key={index} className="group relative bg-gray-900/50 border-gray-700/50 backdrop-blur-sm hover:bg-gray-800/50 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+                <div className={`absolute inset-0 bg-gradient-to-r ${tool.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-lg`} />
+                <CardContent className="relative p-8">
+                  <div className={`w-16 h-16 ${tool.iconBg} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}>
+                    <tool.icon className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-4">{feature.title}</h3>
-                  <p className="text-gray-300 leading-relaxed">{feature.description}</p>
-                </div>
-              </div>
+                  <h3 className="text-xl font-bold text-white mb-4">{tool.title}</h3>
+                  <p className="text-gray-300 leading-relaxed">{tool.description}</p>
+                </CardContent>
+              </Card>
             ))}
           </div>
 

@@ -8,7 +8,6 @@ import {
   BarChart3, 
   TrendingUp, 
   User, 
-  Settings,
   ChevronRight,
   Menu,
   Home
@@ -77,13 +76,6 @@ const AppSidebar: React.FC<AppSidebarProps> = ({
       title: 'Profile Hub',
       description: 'YouTube channel analytics',
       icon: User,
-      section: 'account'
-    },
-    {
-      id: 'settings',
-      title: 'Settings',
-      description: 'Customize your experience',
-      icon: Settings,
       section: 'account'
     }
   ];
