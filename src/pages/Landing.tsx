@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
-import { Play, Zap, Sparkles, Bot, Rocket, Star, ArrowRight, Globe, Palette, BarChart, TrendingUp, Eye, Target } from 'lucide-react';
+import { Play, Zap, Sparkles, Bot, Rocket, Star, ArrowRight, Globe, Palette, BarChart, TrendingUp, Eye, Target, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
