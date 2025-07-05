@@ -68,74 +68,87 @@ export const generateThumbnailPrompt = async (title: string, keywords: string): 
 
 export const generateThumbnailImage = async (prompt: string): Promise<string> => {
   try {
-    // Using Hugging Face's FLUX model for image generation
-    const response = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer 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',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        inputs: `YouTube thumbnail: ${prompt}. Professional design, 16:9 aspect ratio, 1280x720 resolution, high quality, eye-catching, clickbait style`,
-        parameters: {
-          width: 1280,
-          height: 720,
-          num_inference_steps: 4,
-          guidance_scale: 3.5
-        }
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const blob = await response.blob();
+    // Since we're only using Gemini API and not image generation services,
+    // we'll create a placeholder thumbnail with the generated prompt
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
     
-    // Convert blob to data URL
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
+    if (!ctx) {
+      throw new Error('Canvas context not available');
+    }
+    
+    // Set canvas dimensions for YouTube thumbnail (16:9 aspect ratio)
+    canvas.width = 1280;
+    canvas.height = 720;
+    
+    // Create gradient background
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#667eea');
+    gradient.addColorStop(1, '#764ba2');
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add text overlay
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 48px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // Add shadow for better text visibility
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+    
+    // Wrap text if it's too long
+    const maxWidth = canvas.width - 100;
+    const words = prompt.split(' ').slice(0, 8).join(' '); // Take first 8 words
+    const lines = wrapText(ctx, words, maxWidth, 48);
+    
+    const lineHeight = 60;
+    const startY = (canvas.height - (lines.length * lineHeight)) / 2;
+    
+    lines.forEach((line, index) => {
+      ctx.fillText(line, canvas.width / 2, startY + (index * lineHeight));
     });
+    
+    // Add "AI Generated" watermark
+    ctx.font = '20px Arial, sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.shadowBlur = 0;
+    ctx.fillText('AI Generated Thumbnail', canvas.width - 150, canvas.height - 30);
+    
+    // Convert canvas to data URL
+    return canvas.toDataURL('image/png');
+    
   } catch (error) {
-    console.error('Error generating image with Hugging Face:', error);
-    
-    // Fallback to a different model if the first one fails
-    try {
-      const fallbackResponse = await fetch('https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer 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',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          inputs: `YouTube thumbnail: ${prompt}. Professional design, 16:9 aspect ratio, high quality, eye-catching, clickbait style, bold text overlay`,
-          parameters: {
-            width: 1024,
-            height: 576,
-            num_inference_steps: 20,
-            guidance_scale: 7.5
-          }
-        })
-      });
-
-      if (!fallbackResponse.ok) {
-        throw new Error(`Fallback HTTP error! status: ${fallbackResponse.status}`);
-      }
-
-      const fallbackBlob = await fallbackResponse.blob();
-      
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(fallbackBlob);
-      });
-    } catch (fallbackError) {
-      console.error('Both image generation services failed:', fallbackError);
-      throw new Error('Failed to generate thumbnail image. Please try again later.');
-    }
+    console.error('Error generating thumbnail image:', error);
+    throw new Error('Failed to generate thumbnail image. Please try again later.');
   }
 };
+
+// Helper function to wrap text
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, fontSize: number): string[] {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let currentLine = '';
+  
+  for (const word of words) {
+    const testLine = currentLine + (currentLine ? ' ' : '') + word;
+    const metrics = ctx.measureText(testLine);
+    
+    if (metrics.width > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  }
+  
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  
+  return lines;
+}
