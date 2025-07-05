@@ -1,197 +1,225 @@
 
 import React from 'react';
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
-import { Play, Zap, Sparkles, Bot, Rocket, Star, ArrowRight, Globe, Palette, BarChart, TrendingUp, Eye, Target, Search } from 'lucide-react';
+import { Play, Youtube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 w-60 h-60 bg-cyan-500/10 rounded-full blur-2xl animate-bounce" />
-      </div>
-
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="relative z-10 flex justify-between items-center p-6 lg:p-8">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center">
-            <Bot className="w-6 h-6 text-white" />
+      <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Youtube className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-900">AI Creator Studio</span>
           </div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent">
-            YouTube AI Studio
-          </span>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <SignedOut>
-            <SignInButton mode="modal">
-              <Button variant="ghost" className="text-white hover:bg-white/10">
-                Sign In
-              </Button>
-            </SignInButton>
-            <SignUpButton mode="modal">
-              <Button className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600">
-                Get Started
-              </Button>
-            </SignUpButton>
-          </SignedOut>
-          <SignedIn>
-            <UserButton 
-              appearance={{
-                elements: {
-                  avatarBox: "w-10 h-10"
-                }
-              }}
-            />
-          </SignedIn>
+          
+          <nav className="hidden md:flex items-center space-x-8">
+            <a href="#" className="text-blue-600 font-medium border-b-2 border-blue-600 pb-1">Home</a>
+            <a href="#" className="text-gray-600 hover:text-gray-900">Dashboard</a>
+            <a href="#" className="text-gray-600 hover:text-gray-900">AI Tools</a>
+            <a href="#" className="text-gray-600 hover:text-gray-900">Analytics</a>
+            <a href="#" className="text-gray-600 hover:text-gray-900">Profile</a>
+          </nav>
+          
+          <div className="flex items-center space-x-4">
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button variant="ghost" className="text-gray-600">
+                  Sign In
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Get Started
+                </Button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    avatarBox: "w-8 h-8"
+                  }
+                }}
+              />
+            </SignedIn>
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <main className="relative z-10 px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-16 lg:py-24">
-            <div className="mb-8 inline-flex items-center space-x-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-6 py-3">
-              <Sparkles className="w-4 h-4 text-cyan-400" />
-              <span className="text-sm text-cyan-300">AI-Powered YouTube Optimization</span>
+      <main className="max-w-7xl mx-auto px-6">
+        <div className="text-center py-16">
+          <div className="mb-6 inline-flex items-center space-x-2 bg-gray-100 rounded-full px-4 py-2">
+            <div className="w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
+              <div className="w-2 h-2 bg-gray-800 rounded-full"></div>
             </div>
-            
-            <h1 className="text-5xl lg:text-7xl font-extrabold mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-white via-cyan-200 to-purple-200 bg-clip-text text-transparent">
-                YouTube AI Studio
-              </span>
-            </h1>
-            
-            <p className="text-xl lg:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-              Transform your YouTube channel with intelligent AI tools that understand, analyze, and optimize your 
-              content for maximum impact.
-            </p>
+            <span className="text-sm text-gray-700 font-medium">Powered by Advanced AI Technology</span>
+          </div>
+          
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900">
+            <span className="text-blue-600">AI-Powered</span><br />
+            <span className="bg-gradient-to-r from-red-500 via-purple-500 to-blue-600 bg-clip-text text-transparent">
+              YouTube Studio
+            </span>
+          </h1>
+          
+          <p className="text-xl text-gray-600 mb-12 max-w-4xl mx-auto">
+            Transform your YouTube channel with intelligent analytics, AI-generated content, and data-driven insights that accelerate your creator journey.
+          </p>
 
-            {/* Feature Tags */}
-            <div className="flex flex-wrap justify-center gap-4 mb-12">
-              <div className="flex items-center gap-2 bg-red-500/20 text-red-300 px-4 py-2 rounded-full border border-red-500/30">
-                <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-                Content Generation
-              </div>
-              <div className="flex items-center gap-2 bg-blue-500/20 text-blue-300 px-4 py-2 rounded-full border border-blue-500/30">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                Analytics & Insights
-              </div>
-              <div className="flex items-center gap-2 bg-green-500/20 text-green-300 px-4 py-2 rounded-full border border-green-500/30">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                Viral Optimization
-              </div>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <SignedOut>
-                <SignUpButton mode="modal">
-                  <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-lg px-8 py-4 rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300">
-                    Start Creating <ArrowRight className="ml-2 w-5 h-5" />
-                  </Button>
-                </SignUpButton>
-              </SignedOut>
-              <SignedIn>
-                <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-lg px-8 py-4 rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300">
-                  Open Dashboard <ArrowRight className="ml-2 w-5 h-5" />
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+            <SignedOut>
+              <SignUpButton mode="modal">
+                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg">
+                  Start Creating →
                 </Button>
-              </SignedIn>
-              
-              <Button variant="ghost" size="lg" className="text-white hover:bg-white/10 text-lg px-8 py-4 rounded-full border border-white/20 " onClick={() => window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank")}>
-                <Play className="mr-2 w-5 h-5" />
-                Watch Demo
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg">
+                Start Creating →
               </Button>
-            </div>
+            </SignedIn>
+            
+            <Button variant="ghost" size="lg" className="text-gray-700 hover:text-gray-900 px-8 py-3">
+              Watch Demo
+            </Button>
           </div>
 
-          {/* AI Tools Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-16">
-            {[
-              {
-                icon: Bot,
-                title: "AI Content Generator",
-                description: "Generate optimized YouTube titles, descriptions, tags, and thumbnail prompts using advanced AI.",
-                gradient: "from-pink-500 via-purple-500 to-pink-600",
-                iconBg: "bg-gradient-to-r from-pink-500 to-purple-500"
-              },
-              {
-                icon: Palette,
-                title: "Thumbnail Generator",
-                description: "Create stunning, professional YouTube thumbnails with AI-powered design assistance.",
-                gradient: "from-green-500 via-teal-500 to-green-600",
-                iconBg: "bg-gradient-to-r from-green-500 to-teal-500"
-              },
-              {
-                icon: Search,
-                title: "Thumbnail Search",
-                description: "Discover trending thumbnails and analyze competitor strategies with AI insights.",
-                gradient: "from-purple-500 via-blue-500 to-purple-600",
-                iconBg: "bg-gradient-to-r from-purple-500 to-blue-500"
-              },
-              {
-                icon: BarChart,
-                title: "Outlier Detection",
-                description: "Identify viral videos and content anomalies using statistical analysis and machine learning insights.",
-                gradient: "from-orange-500 via-red-500 to-orange-600",
-                iconBg: "bg-gradient-to-r from-orange-500 to-red-500"
-              },
-              {
-                icon: TrendingUp,
-                title: "Keyword Analyzer",
-                description: "Extract trending keywords with SEO scores and related search phrases for maximum reach.",
-                gradient: "from-blue-500 via-cyan-500 to-blue-600",
-                iconBg: "bg-gradient-to-r from-blue-500 to-cyan-500"
-              }
-            ].map((tool, index) => (
-              <Card key={index} className="group relative bg-gray-900/50 border-gray-700/50 backdrop-blur-sm hover:bg-gray-800/50 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
-                <div className={`absolute inset-0 bg-gradient-to-r ${tool.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-lg`} />
-                <CardContent className="relative p-8">
-                  <div className={`w-16 h-16 ${tool.iconBg} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}>
-                    <tool.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-4">{tool.title}</h3>
-                  <p className="text-gray-300 leading-relaxed">{tool.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* CTA Section */}
-          <div className="text-center py-20">
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-12 lg:p-16">
-              <div className="flex justify-center mb-8">
-                <div className="flex -space-x-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-14 h-8 text-yellow-400 fill-current" />
-                  ))}
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
+            <Card className="bg-white border border-gray-200 p-6">
+              <CardContent className="text-center p-0">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <div className="w-4 h-4 bg-blue-600 rounded"></div>
                 </div>
-              </div>
-              
-              <h2 className="text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Ready to Go Viral?
-              </h2>
-              
-              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                Join thousands of creators who've transformed their YouTube channels with our AI-powered tools.
-              </p>
-              
-              <SignedOut>
-                <SignUpButton mode="modal">
-                  <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-lg px-12 py-4 rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300">
-                    Start Your Journey <Rocket className="ml-2 w-5 h-5" />
-                  </Button>
-                </SignUpButton>
-              </SignedOut>
-              <SignedIn>
-                <Button size="lg" className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-lg px-12 py-4 rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300">
-                  Continue Creating <Rocket className="ml-2 w-5 h-5" />
+                <div className="text-2xl font-bold text-gray-900 mb-1">10K+</div>
+                <div className="text-sm text-gray-600">Creators</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white border border-gray-200 p-6">
+              <CardContent className="text-center p-0">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Play className="w-4 h-4 text-blue-600" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">2M+</div>
+                <div className="text-sm text-gray-600">Videos Optimized</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white border border-gray-200 p-6">
+              <CardContent className="text-center p-0">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <div className="w-4 h-4 bg-blue-600 rounded-full"></div>
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">300%</div>
+                <div className="text-sm text-gray-600">Avg Growth</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white border border-gray-200 p-6">
+              <CardContent className="text-center p-0">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <div className="w-4 h-4 bg-green-500 rounded"></div>
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">99.9%</div>
+                <div className="text-sm text-gray-600">Uptime</div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Everything You Need Section */}
+        <div className="py-16">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+              Everything You Need to <span className="text-blue-600">Succeed</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+              Our comprehensive suite of AI tools and analytics helps you create better content, understand your audience, and grow your channel faster than ever before.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            <Card className="bg-white border border-gray-200 p-8 text-center">
+              <CardContent className="p-0">
+                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-6">
+                  <Youtube className="w-6 h-6 text-red-600" />
+                </div>
+                <h3 className="text-xl font-bold mb-4 text-gray-900">YouTube Analytics</h3>
+                <p className="text-gray-600 text-sm">
+                  Real-time channel insights and performance metrics to optimize your content strategy.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border border-gray-200 p-8 text-center">
+              <CardContent className="p-0">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-6">
+                  <div className="w-6 h-6 bg-purple-600 rounded-full"></div>
+                </div>
+                <h3 className="text-xl font-bold mb-4 text-gray-900">AI Content Tools</h3>
+                <p className="text-gray-600 text-sm">
+                  Generate titles, descriptions, and thumbnails with advanced AI technology.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border border-gray-200 p-8 text-center">
+              <CardContent className="p-0">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-6">
+                  <div className="w-6 h-6 bg-blue-600 rounded"></div>
+                </div>
+                <h3 className="text-xl font-bold mb-4 text-gray-900">Performance Tracking</h3>
+                <p className="text-gray-600 text-sm">
+                  Monitor your growth with detailed analytics and trend predictions.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border border-gray-200 p-8 text-center">
+              <CardContent className="p-0">
+                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-6">
+                  <div className="w-6 h-6 bg-yellow-600 rounded-full"></div>
+                </div>
+                <h3 className="text-xl font-bold mb-4 text-gray-900">Smart Optimization</h3>
+                <p className="text-gray-600 text-sm">
+                  AI-powered recommendations to boost your channel's visibility and engagement.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="py-16">
+          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl p-16 text-center text-white">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Ready to Transform Your Channel?
+            </h2>
+            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+              Join thousands of creators who are already using AI to accelerate their YouTube success.
+            </p>
+            
+            <SignedOut>
+              <SignUpButton mode="modal">
+                <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-4 rounded-lg">
+                  Get Started Free →
                 </Button>
-              </SignedIn>
-            </div>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-4 rounded-lg">
+                Continue Creating →
+              </Button>
+            </SignedIn>
           </div>
         </div>
       </main>
