@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ const ThumbnailSearch: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<YouTubeVideo[]>([]);
   const [similarSearchLoading, setSimilarSearchLoading] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState('');
 
   const handleSearch = async () => {
     if (!query.trim()) {
@@ -24,11 +26,15 @@ const ThumbnailSearch: React.FC = () => {
     setLoading(true);
     try {
       console.log('Searching for:', query);
-      const videos = await youtubeService.searchVideos(query);
+      const videos = await youtubeService.searchVideos(query, apiKey);
       console.log('Search results:', videos);
       
       setResults(videos);
-      toast.success(`Found ${videos.length} YouTube videos!`);
+      if (apiKey) {
+        toast.success(`Found ${videos.length} real YouTube videos!`);
+      } else {
+        toast.info(`Found ${videos.length} videos using mock data. Add your API key to get real results!`);
+      }
     } catch (error) {
       console.error('Search error:', error);
       toast.error('Failed to search thumbnails. Please try again.');
@@ -46,11 +52,15 @@ const ThumbnailSearch: React.FC = () => {
       
       toast.info(`Searching for similar content using: ${tags.join(', ')}`);
       const similarQuery = tags.join(' ');
-      const similarVideos = await youtubeService.searchVideos(similarQuery);
+      const similarVideos = await youtubeService.searchVideos(similarQuery, apiKey);
       
       setResults(similarVideos);
       setQuery(similarQuery);
-      toast.success(`Found ${similarVideos.length} similar videos!`);
+      if (apiKey) {
+        toast.success(`Found ${similarVideos.length} similar real videos!`);
+      } else {
+        toast.success(`Found ${similarVideos.length} similar mock videos!`);
+      }
     } catch (error) {
       console.error('Similar search error:', error);
       toast.error('Failed to find similar thumbnails');
@@ -67,7 +77,7 @@ const ThumbnailSearch: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <ApiKeyManager />
+      <ApiKeyManager onApiKeyChange={setApiKey} />
       
       <Card className="glass-effect">
         <div className="p-6">
@@ -76,11 +86,15 @@ const ThumbnailSearch: React.FC = () => {
               <Search className="w-5 h-5 text-white" />
             </div>
             <h2 className="text-2xl font-bold text-gradient">
-              YouTube Search
+              {apiKey ? 'Real YouTube Search' : 'Mock YouTube Search'}
             </h2>
-            <Badge variant="secondary" className="bg-gradient-to-r from-green-500/20 to-blue-500/20">
+            <Badge variant="secondary" className={`${
+              apiKey 
+                ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20' 
+                : 'bg-gradient-to-r from-orange-500/20 to-red-500/20'
+            }`}>
               <Sparkles className="w-3 h-3 mr-1" />
-              Real Data
+              {apiKey ? 'Real Data' : 'Mock Data'}
             </Badge>
           </div>
           
@@ -98,7 +112,7 @@ const ThumbnailSearch: React.FC = () => {
               className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600"
             >
               <Search className="w-4 h-4 mr-2" />
-              {loading ? 'Searching...' : 'Search'}
+              {loading ? 'Searching...' : (apiKey ? 'Real Search' : 'Mock Search')}
             </Button>
           </div>
           
@@ -106,7 +120,10 @@ const ThumbnailSearch: React.FC = () => {
             <div className="mt-4 p-3 bg-background/30 rounded-lg border border-muted">
               <p className="text-sm text-muted-foreground">
                 <Sparkles className="w-4 h-4 inline mr-1" />
-                Fetching real YouTube data using hardcoded API key...
+                {apiKey 
+                  ? 'Fetching real YouTube data using your API key...'
+                  : 'Using mock data. Add your YouTube API key above to get real results...'
+                }
               </p>
             </div>
           )}

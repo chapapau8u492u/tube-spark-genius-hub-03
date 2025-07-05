@@ -21,6 +21,7 @@ const OutlierDetector: React.FC = () => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<OutlierVideo[]>([]);
+  const [apiKey, setApiKey] = useState('');
 
   const calculateIQR = (values: number[]) => {
     const sorted = values.slice().sort((a, b) => a - b);
@@ -118,7 +119,7 @@ const OutlierDetector: React.FC = () => {
     setLoading(true);
     try {
       console.log('Fetching YouTube data for outlier detection:', query);
-      const videos = await youtubeService.searchVideos(query);
+      const videos = await youtubeService.searchVideos(query, apiKey);
       
       if (videos.length === 0) {
         toast.error('No videos found for the given query');
@@ -131,7 +132,12 @@ const OutlierDetector: React.FC = () => {
       setResult(analyzedVideos);
       
       const outlierCount = analyzedVideos.filter(v => v.isOutlier).length;
-      toast.success(`Analyzed ${videos.length} YouTube videos! Found ${outlierCount} outliers.`);
+      
+      if (apiKey) {
+        toast.success(`Analyzed ${videos.length} real YouTube videos! Found ${outlierCount} outliers.`);
+      } else {
+        toast.success(`Analyzed ${videos.length} mock videos! Found ${outlierCount} outliers.`);
+      }
     } catch (error) {
       console.error('Outlier detection error:', error);
       toast.error('Failed to analyze outliers. Please try again.');
@@ -155,7 +161,7 @@ const OutlierDetector: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <ApiKeyManager />
+      <ApiKeyManager onApiKeyChange={setApiKey} />
       
       <Card className="glass-effect">
         <div className="p-6">
@@ -166,9 +172,13 @@ const OutlierDetector: React.FC = () => {
             <h2 className="text-2xl font-bold text-gradient">
               High-Performance Video Finder
             </h2>
-            <Badge variant="secondary" className="bg-gradient-to-r from-green-500/20 to-blue-500/20">
+            <Badge variant="secondary" className={`${
+              apiKey 
+                ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20' 
+                : 'bg-gradient-to-r from-orange-500/20 to-red-500/20'
+            }`}>
               <Sparkles className="w-3 h-3 mr-1" />
-              Real Data
+              {apiKey ? 'Real Data' : 'Mock Data'}
             </Badge>
           </div>
           
