@@ -1,4 +1,3 @@
-
 const GEMINI_API_KEY = 'AIzaSyBdmJafDA7pVwj7cshLLi1PMfzsuxxkoy8';
 
 export const uploadToImageKit = async (file: File): Promise<string> => {
@@ -90,42 +89,96 @@ export const generateThumbnailPrompt = async (title: string, keywords: string): 
 
 export const generateThumbnailImage = async (prompt: string): Promise<string> => {
   try {
-    console.log('Generating thumbnail with prompt:', prompt);
+    console.log('Generating thumbnail with AI for prompt:', prompt);
     
-    // Use Pollinations AI for free image generation
-    const imagePrompt = encodeURIComponent(`YouTube thumbnail: ${prompt}`);
-    const imageUrl = `https://image.pollinations.ai/prompt/${imagePrompt}?width=1280&height=720&seed=${Math.floor(Math.random() * 1000000)}&enhance=true&nologo=true`;
+    // Use Replicate API for J's AI model (NGP image generation)
+    const replicateResponse = await fetch('https://api.replicate.com/v1/predictions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Token r8_6zQj3wLAIuOkKS8R4A9QCyN5BgXhbYk2VpWdF',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        version: "5599ed30703defd1d160a25a63321b4dec97101d98b4674bcc56e41f62f35637",
+        input: {
+          prompt: `YouTube thumbnail: ${prompt}`,
+          width: 1280,
+          height: 720,
+          num_outputs: 1,
+          quality: 95,
+          guidance_scale: 7.5,
+          num_inference_steps: 25
+        }
+      })
+    });
+
+    if (!replicateResponse.ok) {
+      throw new Error('Replicate API failed');
+    }
+
+    const prediction = await replicateResponse.json();
     
-    console.log('Generated image URL:', imageUrl);
-    
-    // Convert the image URL to a data URL for consistent handling
-    const response = await fetch(imageUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch generated image: ${response.status}`);
+    // Poll for completion
+    let result = prediction;
+    while (result.status === 'starting' || result.status === 'processing') {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const statusResponse = await fetch(`https://api.replicate.com/v1/predictions/${result.id}`, {
+        headers: {
+          'Authorization': 'Token r8_6zQj3wLAIuOkKS8R4A9QCyN5BgXhbYk2VpWdF',
+        }
+      });
+      result = await statusResponse.json();
+    }
+
+    if (result.status === 'succeeded' && result.output && result.output[0]) {
+      // Convert the image URL to data URL
+      const imageResponse = await fetch(result.output[0]);
+      const blob = await imageResponse.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
     }
     
-    const blob = await response.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
+    throw new Error('Image generation failed');
     
   } catch (error) {
     console.error('Error generating thumbnail image:', error);
     
-    // Fallback: Try alternative method with different service
+    // Fallback to Hugging Face FLUX model
     try {
-      const fallbackPrompt = encodeURIComponent(`Professional YouTube thumbnail, ${prompt}, high quality, 1280x720, vibrant colors`);
-      const fallbackUrl = `https://api.api-ninjas.com/v1/imagegeneration?prompt=${fallbackPrompt}`;
-      
-      // If all else fails, create a better-looking placeholder
-      return createFallbackThumbnail(prompt);
+      console.log('Trying fallback Hugging Face API...');
+      const response = await fetch(
+        "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+        {
+          headers: {
+            Authorization: "Bearer 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",
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          body: JSON.stringify({
+            inputs: `Professional YouTube thumbnail: ${prompt}, 1280x720, high quality, vibrant colors, bold text, eye-catching`,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      }
     } catch (fallbackError) {
       console.error('Fallback image generation failed:', fallbackError);
-      return createFallbackThumbnail(prompt);
     }
+    
+    // Final fallback to canvas generation
+    return createFallbackThumbnail(prompt);
   }
 };
 

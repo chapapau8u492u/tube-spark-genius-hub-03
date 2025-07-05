@@ -13,6 +13,8 @@ export interface YouTubeVideo {
   tags: string[];
 }
 
+const YOUTUBE_API_KEY = 'AIzaSyBHa2NR6HA3TuIVX-9k8c1Xzo6PNRsa4ds';
+
 const GEMINI_API_KEY = 'AIzaSyBdmJafDA7pVwj7cshLLi1PMfzsuxxkoy8';
 
 const generateGeminiTags = async (video: YouTubeVideo): Promise<string[]> => {
@@ -70,18 +72,16 @@ Return only a JSON array of strings:
 
 export const youtubeService = {
   // Search videos using YouTube Data API
-  searchVideos: async (query: string, apiKey?: string): Promise<YouTubeVideo[]> => {
+  searchVideos: async (query: string): Promise<YouTubeVideo[]> => {
     try {
       console.log('Starting YouTube search for:', query);
       
-      // If API key is provided, use real YouTube API
-      if (apiKey && apiKey.trim()) {
-        console.log('Using YouTube Data API');
-        const realResults = await fetchRealYouTubeData(query, apiKey);
-        if (realResults && realResults.length > 0) {
-          console.log('Real YouTube API successful, returning results');
-          return realResults;
-        }
+      // Use real YouTube API with hardcoded key
+      console.log('Using YouTube Data API');
+      const realResults = await fetchRealYouTubeData(query, YOUTUBE_API_KEY);
+      if (realResults && realResults.length > 0) {
+        console.log('Real YouTube API successful, returning results');
+        return realResults;
       }
       
       console.log('Using fallback mock data');
