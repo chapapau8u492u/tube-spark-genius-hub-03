@@ -1,116 +1,28 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { BarChart3, TrendingUp, AlertTriangle, Sparkles, Eye, ThumbsUp, MessageCircle, Calendar } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Search, Eye, ThumbsUp, MessageCircle, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { youtubeService, YouTubeVideo } from '@/services/youtubeService';
-import ApiKeyManager from './ApiKeyManager';
+import { aiServices } from '@/services/aiService';
 
-interface OutlierVideo extends YouTubeVideo {
-  viewsPerDay: number;
-  engagementRate: number;
-  smartScore: number;
-  isOutlier: boolean;
-  outlierScore: number;
-  daysSincePublished: number;
+interface EnhancedVideo extends YouTubeVideo {
+  isOutlier?: boolean;
+  outlierScore?: number;
+  smartScore?: number;
+  viewsPerDay?: number;
+  engagementRate?: number;
 }
 
 const OutlierDetector: React.FC = () => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<OutlierVideo[]>([]);
-  const [apiKey, setApiKey] = useState('');
+  const [results, setResults] = useState<EnhancedVideo[]>([]);
 
-  const calculateIQR = (values: number[]) => {
-    const sorted = values.slice().sort((a, b) => a - b);
-    const q1Index = Math.floor(sorted.length * 0.25);
-    const q3Index = Math.floor(sorted.length * 0.75);
-    const q1 = sorted[q1Index];
-    const q3 = sorted[q3Index];
-    const iqr = q3 - q1;
-    const lowerBound = q1 - 1.5 * iqr;
-    const upperBound = q3 + 1.5 * iqr;
-    return { q1, q3, iqr, lowerBound, upperBound };
-  };
-
-  const processVideosForOutliers = (videos: YouTubeVideo[]): OutlierVideo[] => {
-    console.log('Processing videos for outlier detection:', videos.length);
-    
-    // Convert and calculate metrics for each video
-    const processedVideos: OutlierVideo[] = videos.map(video => {
-      const viewCount = parseInt(video.viewCount?.toString() || '0');
-      const likeCount = parseInt(video.likeCount?.toString() || '0');
-      const commentCount = parseInt(video.commentCount?.toString() || '0');
-      
-      const today = new Date();
-      const publishDate = new Date(video.publishedAt);
-      const daysSincePublished = Math.max(1, Math.floor((today.getTime() - publishDate.getTime()) / (1000 * 60 * 60 * 24)));
-      const viewsPerDay = Math.floor(viewCount / daysSincePublished);
-      const engagementRate = viewCount > 0 ? ((likeCount + commentCount) / viewCount * 100) : 0;
-      
-      return {
-        ...video,
-        viewCount,
-        likeCount,
-        commentCount,
-        daysSincePublished,
-        viewsPerDay,
-        engagementRate: parseFloat(engagementRate.toFixed(2)),
-        smartScore: 0,
-        isOutlier: false,
-        outlierScore: 0
-      };
-    });
-
-    // Calculate IQR for views
-    const viewCounts = processedVideos.map(v => v.viewCount);
-    const viewsIQR = calculateIQR(viewCounts);
-    
-    // Calculate statistics for smart score normalization
-    const avgViews = viewCounts.reduce((a, b) => a + b, 0) / viewCounts.length;
-    const maxViewsPerDay = Math.max(...processedVideos.map(v => v.viewsPerDay));
-    const maxEngagementRate = Math.max(...processedVideos.map(v => v.engagementRate));
-    
-    console.log('Outlier analysis stats:', {
-      avgViews,
-      maxViewsPerDay,
-      maxEngagementRate,
-      viewsIQR
-    });
-
-    // Calculate final metrics for each video
-    return processedVideos.map(video => {
-      // Check if outlier using IQR method
-      const isOutlierByViews = video.viewCount > viewsIQR.upperBound;
-      
-      // Calculate outlier score (distance from upper bound)
-      const outlierScore = isOutlierByViews && viewsIQR.iqr > 0 
-        ? parseFloat(((video.viewCount - viewsIQR.upperBound) / viewsIQR.iqr).toFixed(2))
-        : 0;
-      
-      // Calculate smart score (weighted combination)
-      const viewScore = avgViews > 0 ? (video.viewCount / avgViews) : 1;
-      const velocityScore = maxViewsPerDay > 0 ? (video.viewsPerDay / maxViewsPerDay) : 0;
-      const engagementScore = maxEngagementRate > 0 ? (video.engagementRate / maxEngagementRate) : 0;
-      
-      const smartScore = parseFloat((
-        viewScore * 0.5 +
-        velocityScore * 0.3 +
-        engagementScore * 0.2
-      ).toFixed(2));
-
-      return {
-        ...video,
-        smartScore,
-        isOutlier: isOutlierByViews,
-        outlierScore: Math.max(0, outlierScore)
-      };
-    }).sort((a, b) => b.smartScore - a.smartScore); // Sort by smart score descending
-  };
-
-  const handleDetect = async () => {
+  const handleSearch = async () => {
     if (!query.trim()) {
       toast.error('Please enter a search query');
       return;
@@ -118,39 +30,41 @@ const OutlierDetector: React.FC = () => {
 
     setLoading(true);
     try {
-      console.log('Fetching YouTube data for outlier detection:', query);
-      const videos = await youtubeService.searchVideos(query, apiKey);
+      console.log('Searching for outliers:', query);
+      const videos = await youtubeService.searchVideos(query);
       
-      if (videos.length === 0) {
-        toast.error('No videos found for the given query');
-        setResult([]);
-        return;
-      }
-
-      console.log('Fetched videos:', videos.length);
-      const analyzedVideos = processVideosForOutliers(videos);
-      setResult(analyzedVideos);
+      // Calculate additional metrics
+      const enhancedVideos = videos.map(video => ({
+        ...video,
+        viewsPerDay: calculateViewsPerDay(video.publishedAt, video.viewCount),
+        engagementRate: calculateEngagementRate(video.viewCount, video.likeCount, video.commentCount)
+      }));
       
-      const outlierCount = analyzedVideos.filter(v => v.isOutlier).length;
+      // Detect outliers using AI service
+      const videosWithOutliers = aiServices.detectOutliers(enhancedVideos);
       
-      if (apiKey) {
-        toast.success(`Analyzed ${videos.length} real YouTube videos! Found ${outlierCount} outliers.`);
-      } else {
-        toast.success(`Analyzed ${videos.length} mock videos! Found ${outlierCount} outliers.`);
-      }
+      setResults(videosWithOutliers);
+      
+      const outlierCount = videosWithOutliers.filter(v => v.isOutlier).length;
+      toast.success(`Found ${videosWithOutliers.length} videos with ${outlierCount} outliers detected!`);
     } catch (error) {
-      console.error('Outlier detection error:', error);
-      toast.error('Failed to analyze outliers. Please try again.');
+      console.error('Search error:', error);
+      toast.error('Failed to detect outliers. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const getOutlierBadgeColor = (isOutlier: boolean, score: number) => {
-    if (!isOutlier) return 'bg-gray-500/90';
-    if (score > 2) return 'bg-red-500/90';
-    if (score > 1) return 'bg-orange-500/90';
-    return 'bg-yellow-500/90';
+  const calculateViewsPerDay = (publishedAt: string, viewCount: number): number => {
+    const publishedDate = new Date(publishedAt);
+    const currentDate = new Date();
+    const daysDiff = Math.max(1, Math.floor((currentDate.getTime() - publishedDate.getTime()) / (1000 * 60 * 60 * 24)));
+    return Math.round(viewCount / daysDiff);
+  };
+
+  const calculateEngagementRate = (views: number, likes: number, comments: number): number => {
+    if (views === 0) return 0;
+    return Number(((likes + comments) / views * 100).toFixed(2));
   };
 
   const formatNumber = (num: number) => {
@@ -159,154 +73,125 @@ const OutlierDetector: React.FC = () => {
     return num.toString();
   };
 
+  const getOutlierBadge = (video: EnhancedVideo) => {
+    if (!video.isOutlier) return null;
+    
+    const isPositiveOutlier = video.smartScore && video.smartScore > 1;
+    return (
+      <Badge 
+        variant={isPositiveOutlier ? "default" : "destructive"} 
+        className="text-xs"
+      >
+        <AlertTriangle className="w-3 h-3 mr-1" />
+        {isPositiveOutlier ? 'High Performer' : 'Low Performer'}
+      </Badge>
+    );
+  };
+
   return (
     <div className="space-y-6">
-      <ApiKeyManager onApiKeyChange={setApiKey} />
-      
       <Card className="glass-effect">
         <div className="p-6">
           <div className="flex items-center space-x-3 mb-6">
             <div className="p-2 rounded-lg bg-gradient-to-br from-orange-500 to-red-500">
-              <BarChart3 className="w-5 h-5 text-white" />
+              <AlertTriangle className="w-5 h-5 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-gradient">
-              High-Performance Video Finder
-            </h2>
-            <Badge variant="secondary" className={`${
-              apiKey 
-                ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20' 
-                : 'bg-gradient-to-r from-orange-500/20 to-red-500/20'
-            }`}>
-              <Sparkles className="w-3 h-3 mr-1" />
-              {apiKey ? 'Real Data' : 'Mock Data'}
+            <h2 className="text-2xl font-bold text-gradient">Outlier Detection</h2>
+            <Badge variant="secondary" className="bg-gradient-to-r from-orange-500/20 to-red-500/20">
+              <TrendingUp className="w-3 h-3 mr-1" />
+              Smart Analysis
             </Badge>
           </div>
           
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Find viral videos in your niche
-              </label>
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder='Enter your niche (e.g., "programming tutorial", "fitness tips", "cooking recipes")'
-                className="bg-background/50 border-muted"
-                onKeyPress={(e) => e.key === 'Enter' && handleDetect()}
-              />
-            </div>
-            
+          <div className="flex space-x-2">
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search for videos to detect outliers (e.g., 'programming tutorial', 'cooking')..."
+              className="bg-background/50 border-muted"
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            />
             <Button 
-              onClick={handleDetect} 
+              onClick={handleSearch} 
               disabled={loading}
-              className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
             >
-              {loading ? 'Analyzing Performance...' : 'Find High-Performing Videos'}
+              <Search className="w-4 h-4 mr-2" />
+              {loading ? 'Analyzing...' : 'Detect Outliers'}
             </Button>
+          </div>
+          
+          <div className="mt-4 p-3 bg-background/30 rounded-lg border border-muted">
+            <p className="text-sm text-muted-foreground">
+              <Zap className="w-4 h-4 inline mr-1" />
+              AI-powered outlier detection identifies videos with unusual performance patterns compared to similar content.
+            </p>
           </div>
         </div>
       </Card>
 
-      {result.length > 0 && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold flex items-center">
-              <TrendingUp className="w-5 h-5 mr-2 text-orange-500" />
-              Performance Analysis Results
-            </h3>
-            <div className="flex space-x-2">
-              <Badge variant="outline">
-                {result.length} videos
-              </Badge>
-              <Badge variant="destructive">
-                {result.filter(v => v.isOutlier).length} high performers
-              </Badge>
-            </div>
+      {results.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <h3 className="text-lg font-semibold">Analysis Results</h3>
+            <Badge variant="outline">{results.length} videos analyzed</Badge>
+            <Badge variant="outline">
+              {results.filter(v => v.isOutlier).length} outliers found
+            </Badge>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {result.map((video, index) => (
-              <Card key={video.id} className="glass-effect overflow-hidden hover:scale-105 transition-all duration-300 group relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {results.map((video) => (
+              <Card key={video.id} className={`glass-effect overflow-hidden transition-all ${
+                video.isOutlier ? 'ring-2 ring-orange-500/50' : ''
+              }`}>
                 <div className="relative">
                   <img
                     src={video.thumbnail}
                     alt={video.title}
                     className="w-full h-40 object-cover"
                   />
-                  
-                  {/* Outlier Score Badge - Top Right */}
-                  <div className={`absolute top-2 right-2 px-2 py-1 rounded-md text-white text-xs font-bold ${getOutlierBadgeColor(video.isOutlier, video.outlierScore)}`}>
-                    {video.smartScore}x
-                  </div>
-                  
-                  {/* High Performer Badge - Top Left */}
-                  {video.isOutlier && (
-                    <div className="absolute top-2 left-2">
-                      <Badge className="bg-green-500/90 text-white text-xs">
-                        🔥 Viral
-                      </Badge>
-                    </div>
-                  )}
-                  
-                  {/* Rank Badge - Bottom Left */}
-                  <div className="absolute bottom-2 left-2">
-                    <Badge variant="secondary" className="text-xs bg-black/50 text-white border-none">
-                      #{index + 1}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-2 left-2 right-2 flex justify-between items-end">
+                    <Badge variant="secondary" className="text-xs">
+                      {new Date(video.publishedAt).toLocaleDateString()}
                     </Badge>
+                    {getOutlierBadge(video)}
                   </div>
                 </div>
                 
-                <div className="p-4 space-y-3">
-                  <h4 className="font-medium text-sm line-clamp-2 leading-tight">{video.title}</h4>
-                  <p className="text-xs text-muted-foreground">{video.channelTitle}</p>
+                <div className="p-4">
+                  <h3 className="font-medium text-sm line-clamp-2 mb-2">{video.title}</h3>
+                  <p className="text-xs text-muted-foreground mb-3">{video.channelTitle}</p>
                   
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="flex items-center text-muted-foreground">
+                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground mb-3">
+                    <div className="flex items-center">
                       <Eye className="w-3 h-3 mr-1" />
                       {formatNumber(video.viewCount)}
                     </div>
-                    <div className="flex items-center text-muted-foreground">
+                    <div className="flex items-center">
                       <ThumbsUp className="w-3 h-3 mr-1" />
                       {formatNumber(video.likeCount)}
                     </div>
-                    <div className="flex items-center text-muted-foreground">
+                    <div className="flex items-center">
+                      <MessageCircle className="w-3 h-3 mr-1" />
+                      {formatNumber(video.commentCount)}
+                    </div>
+                    <div className="flex items-center">
                       <TrendingUp className="w-3 h-3 mr-1" />
-                      {formatNumber(video.viewsPerDay)}/day
-                    </div>
-                    <div className="flex items-center text-muted-foreground">
-                      <Calendar className="w-3 h-3 mr-1" />
-                      {video.daysSincePublished}d ago
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">Engagement Rate</span>
-                      <span className="text-xs font-medium">{video.engagementRate}%</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">Performance Score</span>
-                      <span className={`text-xs font-bold ${
-                        video.smartScore > 1.5 ? 'text-green-500' : 
-                        video.smartScore > 1.0 ? 'text-yellow-500' : 'text-red-500'
-                      }`}>
-                        {video.smartScore}x
-                      </span>
+                      {video.engagementRate}%
                     </div>
                   </div>
                   
                   {video.isOutlier && (
-                    <div className="mt-3 p-2 bg-green-500/10 rounded border border-green-500/20">
-                      <div className="flex items-center justify-center text-center">
-                        <div>
-                          <p className="text-xs text-green-400 font-medium">
-                            🚀 High Performer!
-                          </p>
-                          <p className="text-xs text-green-300 mt-1">
-                            Outlier Score: {video.outlierScore}
-                          </p>
-                        </div>
+                    <div className="mt-3 p-2 bg-orange-500/10 rounded border border-orange-500/20">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-muted-foreground">Smart Score:</span>
+                        <span className="font-medium">{video.smartScore?.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-muted-foreground">Views/Day:</span>
+                        <span className="font-medium">{formatNumber(video.viewsPerDay || 0)}</span>
                       </div>
                     </div>
                   )}

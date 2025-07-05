@@ -1,9 +1,23 @@
 
 const GEMINI_API_KEY = 'AIzaSyBdmJafDA7pVwj7cshLLi1PMfzsuxxkoy8';
 
-const generateGeminiContent = async (prompt: string): Promise<string> => {
+export type AIModel = 'ai1' | 'ai2';
+
+const AI_MODELS = {
+  ai1: {
+    name: 'AI 1',
+    endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+  },
+  ai2: {
+    name: 'AI 2', 
+    endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent'
+  }
+};
+
+const generateGeminiContent = async (prompt: string, model: AIModel = 'ai1'): Promise<string> => {
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const modelConfig = AI_MODELS[model];
+    const response = await fetch(`${modelConfig.endpoint}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,7 +56,7 @@ const generateGeminiContent = async (prompt: string): Promise<string> => {
 
 export const aiServices = {
   // Content Generator - Generates YouTube titles, descriptions, tags
-  generateContent: async (topic: string): Promise<any> => {
+  generateContent: async (topic: string, model: AIModel = 'ai1'): Promise<any> => {
     try {
       const prompt = `You are an expert YouTube SEO strategist and AI creative assistant. Based on the user input "${topic}", generate a JSON response only (no explanation, no markdown, no commentary), containing:
 1. Three YouTube video titles optimized for SEO.
@@ -75,7 +89,7 @@ Return format (JSON only):
   ]
 }`;
 
-      const content = await generateGeminiContent(prompt);
+      const content = await generateGeminiContent(prompt, model);
       console.log('Gemini Response:', content);
       
       // Try to parse JSON from the response
@@ -92,7 +106,7 @@ Return format (JSON only):
   },
 
   // Keyword Analysis - Generates SEO keywords with scores
-  analyzeKeywords: async (topic: string): Promise<any> => {
+  analyzeKeywords: async (topic: string, model: AIModel = 'ai1'): Promise<any> => {
     try {
       const prompt = `Given the user input "${topic}" and YouTube video optimization, extract high-ranking SEO-relevant keywords.
 For each keyword:
@@ -114,7 +128,7 @@ Return JSON format only:
   ]
 }`;
 
-      const content = await generateGeminiContent(prompt);
+      const content = await generateGeminiContent(prompt, model);
       console.log('Keyword Analysis Response:', content);
       
       const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -130,7 +144,7 @@ Return JSON format only:
   },
 
   // Thumbnail Analysis - Analyzes thumbnails and generates tags
-  analyzeThumbnail: async (video: any): Promise<string[]> => {
+  analyzeThumbnail: async (video: any, model: AIModel = 'ai1'): Promise<string[]> => {
     try {
       const prompt = `Analyze this YouTube video and generate relevant search tags based on the title and context:
 Title: "${video.title}"
@@ -140,7 +154,7 @@ Description: Generate 5-8 relevant search tags that would help find similar vide
 Return only a JSON array of strings:
 ["tag1", "tag2", "tag3", "tag4", "tag5"]`;
 
-      const content = await generateGeminiContent(prompt);
+      const content = await generateGeminiContent(prompt, model);
       console.log('Thumbnail Analysis Response:', content);
       
       const jsonMatch = content.match(/\[[\s\S]*\]/);
@@ -155,6 +169,38 @@ Return only a JSON array of strings:
       // Return fallback tags
       return [video.title.split(' ').slice(0, 3).join(' '), 'tutorial', 'guide', 'tips'];
     }
+  },
+
+  // Generate thumbnail prompt using Gemini
+  generateThumbnailPrompt: async (title: string, keywords: string = '', model: AIModel = 'ai1'): Promise<string> => {
+    try {
+      const prompt = `Create a detailed prompt for generating a YouTube thumbnail image based on:
+Title: "${title}"
+Keywords: "${keywords}"
+
+Generate a professional thumbnail prompt that includes:
+- Eye-catching visual elements
+- Bold text overlay suggestions
+- Color scheme recommendations
+- Professional YouTube thumbnail style
+- High contrast and readability
+
+Return only the image generation prompt, no additional text.`;
+
+      const content = await generateGeminiContent(prompt, model);
+      return content.trim();
+    } catch (error) {
+      console.error('Thumbnail Prompt Generation Error:', error);
+      throw error;
+    }
+  },
+
+  // Get available AI models
+  getAvailableModels: () => {
+    return Object.entries(AI_MODELS).map(([key, value]) => ({
+      id: key as AIModel,
+      name: value.name
+    }));
   },
 
   // Outlier Detection - Calculates outlier scores for video data

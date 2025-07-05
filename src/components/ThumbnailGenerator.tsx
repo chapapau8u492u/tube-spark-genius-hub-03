@@ -3,13 +3,16 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Image, Wand2, Download, Upload, X, Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Image, Wand2, Download, Upload, X, Loader2, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import { uploadToImageKit, generateThumbnailPrompt, generateThumbnailImage } from '@/utils/imageUtils';
+import { aiServices, AIModel } from '@/services/aiService';
 
 const ThumbnailGenerator: React.FC = () => {
   const [title, setTitle] = useState('');
   const [keywords, setKeywords] = useState('');
+  const [selectedModel, setSelectedModel] = useState<AIModel>('ai1');
   const [loading, setLoading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [referenceImage, setReferenceImage] = useState<File | null>(null);
@@ -17,6 +20,8 @@ const ThumbnailGenerator: React.FC = () => {
   const [referenceImagePreview, setReferenceImagePreview] = useState<string | null>(null);
   const [faceImagePreview, setFaceImagePreview] = useState<string | null>(null);
   const [generationSteps, setGenerationSteps] = useState<string>('');
+
+  const availableModels = aiServices.getAvailableModels();
 
   const handleReferenceImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -65,34 +70,33 @@ const ThumbnailGenerator: React.FC = () => {
       if (referenceImage) {
         setGenerationSteps('Uploading reference image to cloud...');
         referenceImageUrl = await uploadToImageKit(referenceImage);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate upload time
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
       
       if (faceImage) {
         setGenerationSteps('Uploading face image to cloud...');
         faceImageUrl = await uploadToImageKit(faceImage);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate upload time
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
-      // Step 2: Generate AI prompt for thumbnail using Gemini
-      setGenerationSteps('Generating creative AI prompt using Gemini...');
-      const thumbnailPrompt = await generateThumbnailPrompt(title, keywords);
+      // Step 2: Generate AI prompt for thumbnail using selected Gemini model
+      setGenerationSteps(`Generating creative AI prompt using ${availableModels.find(m => m.id === selectedModel)?.name}...`);
+      const thumbnailPrompt = await aiServices.generateThumbnailPrompt(title, keywords, selectedModel);
       console.log('Generated prompt:', thumbnailPrompt);
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call time
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
       // Step 3: Generate thumbnail image using AI
       setGenerationSteps('Creating thumbnail with AI model...');
       const generatedThumbnail = await generateThumbnailImage(thumbnailPrompt);
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate image generation time
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Step 4: Store generated thumbnail
       setGenerationSteps('Storing thumbnail to cloud...');
-      // In production, you'd upload the generated image to ImageKit here
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate storage time
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       setGeneratedImage(generatedThumbnail);
       setGenerationSteps('');
-      toast.success('Thumbnail generated successfully with Gemini AI!');
+      toast.success(`Thumbnail generated successfully with ${availableModels.find(m => m.id === selectedModel)?.name}!`);
       
     } catch (error) {
       console.error('Generation error:', error);
@@ -142,6 +146,25 @@ const ThumbnailGenerator: React.FC = () => {
                 placeholder="e.g., react, javascript, programming, tutorial, coding"
                 className="bg-background/50 border-muted min-h-20"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                <Settings className="w-4 h-4 inline mr-1" />
+                AI Model Selection
+              </label>
+              <Select value={selectedModel} onValueChange={(value) => setSelectedModel(value as AIModel)}>
+                <SelectTrigger className="bg-background/50 border-muted">
+                  <SelectValue placeholder="Select AI model" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableModels.map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      {model.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Image Upload Section */}
@@ -289,7 +312,7 @@ const ThumbnailGenerator: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-muted-foreground">Generated using</p>
-                  <p className="font-medium">AI</p>
+                  <p className="font-medium">{availableModels.find(m => m.id === selectedModel)?.name}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Optimized for</p>
